@@ -22,7 +22,7 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
     <div className="px-4">
       {/* Commission Wallet */}
       <div className="rounded-card p-5 text-white mb-3"
-        style={{ background: "linear-gradient(135deg, #2B4C6F, #1A3550)" }}>
+        style={{ background: "linear-gradient(135deg, #D4872C, #B8711F)" }}>
         <p className="text-xs opacity-80 mb-1">Available Balance</p>
         <p className="text-3xl font-bold">{formatINR(partner.available_commission || 0)}</p>
 

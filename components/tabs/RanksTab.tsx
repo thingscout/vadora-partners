@@ -19,7 +19,7 @@ export default function RanksTab({ leaderboard, currentPartnerId }: RanksTabProp
       {/* My Rank */}
       {myEntry && (
         <div className="rounded-card p-4 text-white mb-3"
-          style={{ background: "linear-gradient(135deg, #2B4C6F, #1A3550)" }}>
+          style={{ background: "linear-gradient(135deg, #D4872C, #B8711F)" }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">

@@ -18,7 +18,7 @@ interface DashboardLayoutProps {
 }
 
 const TAB_TITLES: Record<TabId, string> = {
-  home: "Dashboard",
+  home: "Vadora Beauty Parner",
   orders: "Orders",
   customers: "My Customers",
   earnings: "Earnings",

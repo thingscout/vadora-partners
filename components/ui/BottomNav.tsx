@@ -19,15 +19,16 @@ interface BottomNavProps {
 
 export default function BottomNav({ active, onChange }: BottomNavProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-v-border flex shadow-[0_-2px_16px_rgba(0,0,0,0.04)] z-[100]"
+    <div className="fixed bottom-0 left-0 right-0 border-t border-v-border flex shadow-[0_-2px_16px_rgba(0,0,0,0.04)] z-[100]"
+      style={{ background: "linear-gradient(to right, #2B4C6F, #1A3550)", paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}>
       {tabs.map((t) => {
         const isActive = active === t.id;
         return (
           <button key={t.id} onClick={() => onChange(t.id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 border-none bg-none transition-colors ${isActive ? "text-brand" : "text-v-muted"}`}>
-            {t.icon(isActive ? "#2B4C6F" : "#7A8694")}
-            <span className={`text-[9px] ${isActive ? "font-bold" : "font-medium"}`}>{t.label}</span>
+            className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 border-none bg-none transition-colors ${isActive ? "text-white" : "text-white/50"}`}>
+            {t.icon(isActive ? "#D4872C" : "rgba(255,255,255,0.5)")}
+            <span className={`text-[9px] ${isActive ? "font-bold text-[#D4872C]" : "font-medium"}`}>{t.label}</span>
           </button>
         );
       })}
