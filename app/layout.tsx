@@ -13,14 +13,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#8B5E83",
+  themeColor: "#2B4C6F",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head><link rel="apple-touch-icon" href="/icon-192.png" /></head>
-      <body className="bg-brand-bg min-h-screen">{children}</body>
+      <body className="min-h-screen" style={{ background: "#F8F9FB" }}>{children}</body>
     </html>
   );
 }

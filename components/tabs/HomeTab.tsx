@@ -26,7 +26,7 @@ export default function HomeTab({ partner, earnings, tiers, notifications }: Hom
     <div className="px-4">
       {/* Greeting Banner */}
       <div className="rounded-card p-5 text-white mb-3"
-        style={{ background: "linear-gradient(135deg, #8B5E83, #6B4063)" }}>
+        style={{ background: "linear-gradient(135deg, #2B4C6F, #1A3550)" }}>
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold flex-shrink-0">
             {partner.avatar_initials}

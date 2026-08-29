@@ -8,23 +8,26 @@ module.exports = {
     extend: {
       // ╔══════════════════════════════════════════════════╗
       // ║  VADORA THEME — Change brand colors here only   ║
+      // ║  60% White / 30% Navy / 10% Orange              ║
       // ╚══════════════════════════════════════════════════╝
       colors: {
         brand: {
-          DEFAULT: "#8B5E83",
-          dark:    "#6B4063",
-          light:   "#F3ECF1",
-          bg:      "#FAF7F4",
+          DEFAULT: "#2B4C6F",       // Navy blue (primary)
+          dark:    "#1A3550",       // Darker navy
+          light:   "#EBF0F5",       // Light navy tint
+          bg:      "#F8F9FB",       // App background (near-white)
+          accent:  "#D4872C",       // Orange accent (10%)
+          "accent-light": "#FDF3E8", // Light orange tint
         },
         tier: {
-          gold:   "#C9A84C",
+          gold:   "#D4872C",        // Uses brand orange
           silver: "#9EAAB0",
           bronze: "#B87D5E",
         },
         v: {
-          text:    "#2C2326",
-          muted:   "#8A7F83",
-          border:  "#EDE7E9",
+          text:    "#1A2332",
+          muted:   "#7A8694",
+          border:  "#E2E7ED",
           success: "#5A8F6B",
           error:   "#C0616B",
           warning: "#D4A843",

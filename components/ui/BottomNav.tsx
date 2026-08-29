@@ -26,7 +26,7 @@ export default function BottomNav({ active, onChange }: BottomNavProps) {
         return (
           <button key={t.id} onClick={() => onChange(t.id)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 border-none bg-none transition-colors ${isActive ? "text-brand" : "text-v-muted"}`}>
-            {t.icon(isActive ? "#8B5E83" : "#8A7F83")}
+            {t.icon(isActive ? "#2B4C6F" : "#7A8694")}
             <span className={`text-[9px] ${isActive ? "font-bold" : "font-medium"}`}>{t.label}</span>
           </button>
         );

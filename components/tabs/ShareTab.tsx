@@ -53,7 +53,7 @@ export default function ShareTab({ partner }: ShareTabProps) {
     <div className="px-4">
       {/* Referral Code Card */}
       <div className="rounded-card p-5 text-white mb-3 text-center"
-        style={{ background: "linear-gradient(135deg, #8B5E83, #6B4063)" }}>
+        style={{ background: "linear-gradient(135deg, #2B4C6F, #1A3550)" }}>
         <p className="text-xs opacity-80 mb-1">Your Referral / Discount Code</p>
         <div className="bg-white/15 backdrop-blur-md rounded-btn px-4 py-3 inline-block mb-3">
           <p className="text-[28px] font-extrabold tracking-[3px]">{code}</p>

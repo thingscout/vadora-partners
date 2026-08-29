@@ -22,6 +22,7 @@ export default function Home() {
   async function checkAuth() {
     try {
       const session = await getSession();
+      console.log("DEBUG: session =", session ? "YES (user: " + session.user?.email + ")" : "NO");
       if (!session) {
         setView("landing");
         return;
@@ -29,20 +30,24 @@ export default function Home() {
 
       // User is logged in — check partner status
       const status = await getPartnerStatus();
+      console.log("DEBUG: partner status =", JSON.stringify(status));
 
       if (!status) {
         // Logged in but no partner record — needs to register
+        console.log("DEBUG: No partner found → showing register");
         setView("register");
       } else if (status.status === "pending") {
         setView("pending");
       } else if (status.status === "rejected") {
         setView("rejected");
       } else if (status.status === "approved" && status.is_active) {
+        console.log("DEBUG: Approved → showing dashboard");
         setView("dashboard");
       } else {
         setView("pending");
       }
-    } catch {
+    } catch (err) {
+      console.error("DEBUG: checkAuth error:", err);
       setView("landing");
     }
   }
