@@ -14,7 +14,7 @@ export default function PendingPage({ onLogout }: PendingPageProps) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-brand-bg">
-      <div className="bg-white rounded-[20px] p-8 w-full max-w-[380px] shadow-card-lg text-center">
+      <div className="bg-brand-surface rounded-[20px] p-8 w-full max-w-[380px] shadow-card-lg text-center">
         {/* Clock icon */}
         <div className="w-20 h-20 rounded-full bg-brand-light flex items-center justify-center mx-auto mb-5">
           <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#8B5E83" strokeWidth="1.5">

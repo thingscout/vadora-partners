@@ -8,29 +8,36 @@ module.exports = {
     extend: {
       // ╔══════════════════════════════════════════════════╗
       // ║  VADORA THEME — Change brand colors here only   ║
-      // ║  60% White / 30% Navy / 10% Orange              ║
+      // ║  Cream & Orange palette                          ║
       // ╚══════════════════════════════════════════════════╝
       colors: {
         brand: {
-          DEFAULT: "#2B4C6F",       // Navy blue (primary)
-          dark:    "#1A3550",       // Darker navy
-          light:   "#EBF0F5",       // Light navy tint
-          bg:      "#F8F9FB",       // App background (near-white)
-          accent:  "#D4872C",       // Orange accent (10%)
-          "accent-light": "#FDF3E8", // Light orange tint
+          DEFAULT: "#E8792B",        // Primary orange
+          dark:    "#C25F1C",        // Primary pressed/hover
+          light:   "#FBE4D3",        // Primary tint 10%
+          bg:      "#FBF3DC",        // Screen background (cream)
+          surface: "#FFFDF6",        // Card surface
+          accent:  "#E8792B",        // Alias of primary
+          "accent-light": "#FBE4D3", // Alias of primary tint
+        },
+        ink: {
+          DEFAULT: "#3D3D22",        // Dark surface base (hero/nav gradients)
+          dark:    "#242217",        // Darkest ink (gradient end, dark-mode bg)
         },
         tier: {
-          gold:   "#D4872C",        // Uses brand orange
+          gold:   "#E8792B",        // Uses brand orange
           silver: "#9EAAB0",
           bronze: "#B87D5E",
         },
         v: {
-          text:    "#1A2332",
-          muted:   "#7A8694",
-          border:  "#E2E7ED",
-          success: "#5A8F6B",
-          error:   "#C0616B",
-          warning: "#D4A843",
+          text:     "#3D3D22",
+          muted:    "#6E6E4B",
+          disabled: "#B5B399",
+          border:   "#E7DCB8",
+          success:  "#4C7A4C",
+          error:    "#C6483B",
+          warning:  "#E0A94C",
+          info:     "#5C7A8A",
         },
       },
       fontFamily: {

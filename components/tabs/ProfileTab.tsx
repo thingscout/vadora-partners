@@ -26,7 +26,7 @@ export default function ProfileTab({ partner, tiers, onLogout }: ProfileTabProps
   return (
     <div className="px-4">
       {/* Profile Header */}
-      <div className="bg-white rounded-card p-5 shadow-card mb-3 flex items-center gap-4">
+      <div className="bg-brand-surface rounded-card p-5 shadow-card mb-3 flex items-center gap-4">
         <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
           {partner.avatar_initials}
         </div>
@@ -163,7 +163,7 @@ export default function ProfileTab({ partner, tiers, onLogout }: ProfileTabProps
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-card p-4 shadow-card mb-3">
+    <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
       <p className="text-[13px] font-semibold text-v-text mb-3">{title}</p>
       {children}
     </div>

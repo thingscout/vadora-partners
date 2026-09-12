@@ -9,10 +9,10 @@ interface EarningsTabProps {
 }
 
 const PAYOUT_STATUS_STYLE: Record<string, { label: string; color: string; bg: string }> = {
-  pending:    { label: "Pending",    color: "#D4A843", bg: "#D4A84315" },
+  pending:    { label: "Pending",    color: "#E0A94C", bg: "#E0A94C15" },
   processing: { label: "Processing", color: "#6B7FD7", bg: "#6B7FD715" },
-  completed:  { label: "Paid",       color: "#5A8F6B", bg: "#5A8F6B15" },
-  failed:     { label: "Failed",     color: "#C0616B", bg: "#C0616B15" },
+  completed:  { label: "Paid",       color: "#4C7A4C", bg: "#4C7A4C15" },
+  failed:     { label: "Failed",     color: "#C6483B", bg: "#C6483B15" },
 };
 
 export default function EarningsTab({ partner, earnings, payouts }: EarningsTabProps) {
@@ -22,7 +22,7 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
     <div className="px-4">
       {/* Commission Wallet */}
       <div className="rounded-card p-5 text-white mb-3"
-        style={{ background: "linear-gradient(135deg, #D4872C, #B8711F)" }}>
+        style={{ background: "linear-gradient(135deg, #E8792B, #C25F1C)" }}>
         <p className="text-xs opacity-80 mb-1">Available Balance</p>
         <p className="text-3xl font-bold">{formatINR(partner.available_commission || 0)}</p>
 
@@ -44,12 +44,12 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
 
       {/* Current Rate + Next Payout */}
       <div className="grid grid-cols-2 gap-2.5 mb-3">
-        <div className="bg-white rounded-card p-3.5 shadow-card">
+        <div className="bg-brand-surface rounded-card p-3.5 shadow-card">
           <p className="text-[10px] text-v-muted font-medium">Commission Rate</p>
           <p className="text-xl font-bold text-brand mt-1">{partner.tier_rate}%</p>
           <p className="text-[10px] text-v-muted mt-0.5">{partner.tier_name} Tier</p>
         </div>
-        <div className="bg-white rounded-card p-3.5 shadow-card">
+        <div className="bg-brand-surface rounded-card p-3.5 shadow-card">
           <p className="text-[10px] text-v-muted font-medium">Next Payout</p>
           <p className="text-[15px] font-bold text-v-text mt-1">1st of month</p>
           <p className="text-[10px] text-v-muted mt-0.5">Min ₹500 balance</p>
@@ -58,7 +58,7 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
 
       {/* Monthly Earnings Chart */}
       {earnings.length > 0 && (
-        <div className="bg-white rounded-card p-4 shadow-card mb-3">
+        <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
           <p className="text-[13px] font-semibold text-v-text mb-3">Monthly Earnings</p>
           <div className="flex items-end gap-2 h-[90px]">
             {earnings.map((e: any, i: number) => {
@@ -77,7 +77,7 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
       )}
 
       {/* Payout History */}
-      <div className="bg-white rounded-card p-4 shadow-card mb-3">
+      <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
         <p className="text-[13px] font-semibold text-v-text mb-3">Payout History</p>
         {payouts.length === 0 ? (
           <p className="text-xs text-v-muted text-center py-4">No payouts yet</p>

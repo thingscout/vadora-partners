@@ -34,7 +34,7 @@ export default function CustomersTab({ customers, partner }: CustomersTabProps) 
           <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
         </svg>
         <input placeholder="Search customers..." value={search} onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-3 rounded-card bg-white border border-v-border text-sm text-v-text outline-none focus:border-brand shadow-card" />
+          className="w-full pl-9 pr-4 py-3 rounded-card bg-brand-surface border border-v-border text-sm text-v-text outline-none focus:border-brand shadow-card" />
       </div>
 
       {/* Customer List */}
@@ -48,7 +48,7 @@ export default function CustomersTab({ customers, partner }: CustomersTabProps) 
         </div>
       ) : (
         filtered.map((c: any, i: number) => (
-          <div key={i} className="bg-white rounded-card p-4 shadow-card mb-2.5 flex items-center gap-3.5">
+          <div key={i} className="bg-brand-surface rounded-card p-4 shadow-card mb-2.5 flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-full bg-brand-light flex items-center justify-center text-sm font-bold text-brand flex-shrink-0">
               {getInitials(c.customer_name || "?")}
             </div>
@@ -73,7 +73,7 @@ export default function CustomersTab({ customers, partner }: CustomersTabProps) 
 
 function MiniStat({ label, value, color }: { label: string; value: number; color?: string }) {
   return (
-    <div className="bg-white rounded-card p-3 shadow-card text-center">
+    <div className="bg-brand-surface rounded-card p-3 shadow-card text-center">
       <p className={`text-xl font-bold ${color || "text-v-text"}`}>{value}</p>
       <p className="text-[10px] text-v-muted font-medium mt-0.5">{label}</p>
     </div>

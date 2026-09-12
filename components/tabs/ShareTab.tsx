@@ -53,7 +53,7 @@ export default function ShareTab({ partner }: ShareTabProps) {
     <div className="px-4">
       {/* Referral Code Card */}
       <div className="rounded-card p-5 text-white mb-3 text-center"
-        style={{ background: "linear-gradient(135deg, #D4872C, #B8711F)" }}>
+        style={{ background: "linear-gradient(135deg, #E8792B, #C25F1C)" }}>
         <p className="text-xs opacity-80 mb-1">Your Referral / Discount Code</p>
         <div className="bg-white/15 backdrop-blur-md rounded-btn px-4 py-3 inline-block mb-3">
           <p className="text-[28px] font-extrabold tracking-[3px]">{code}</p>
@@ -80,18 +80,18 @@ export default function ShareTab({ partner }: ShareTabProps) {
 
       {/* Share Stats */}
       <div className="grid grid-cols-2 gap-2.5 mb-3">
-        <div className="bg-white rounded-card p-3.5 shadow-card text-center">
+        <div className="bg-brand-surface rounded-card p-3.5 shadow-card text-center">
           <p className="text-[10px] text-v-muted">Total Orders</p>
           <p className="text-xl font-bold text-v-text mt-1">{partner.total_orders || 0}</p>
         </div>
-        <div className="bg-white rounded-card p-3.5 shadow-card text-center">
+        <div className="bg-brand-surface rounded-card p-3.5 shadow-card text-center">
           <p className="text-[10px] text-v-muted">Total Earned</p>
           <p className="text-xl font-bold text-v-success mt-1">{formatINR(partner.total_commission || 0)}</p>
         </div>
       </div>
 
       {/* Ready-Made Captions */}
-      <div className="bg-white rounded-card p-4 shadow-card mb-3">
+      <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
         <p className="text-[13px] font-semibold text-v-text mb-3">Ready-Made Captions</p>
         <p className="text-xs text-v-muted mb-3">Tap to share — your code is auto-inserted</p>
 
@@ -107,7 +107,7 @@ export default function ShareTab({ partner }: ShareTabProps) {
                 WhatsApp
               </button>
               <button onClick={() => shareGeneric(cap.text)}
-                className="flex-1 py-2 rounded-btn bg-white border border-v-border text-v-text text-[11px] font-semibold active:scale-[0.98]">
+                className="flex-1 py-2 rounded-btn bg-brand-surface border border-v-border text-v-text text-[11px] font-semibold active:scale-[0.98]">
                 {copied === "caption" ? "✓ Copied" : "Share / Copy"}
               </button>
             </div>

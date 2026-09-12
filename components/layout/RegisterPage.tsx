@@ -106,7 +106,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
       <div className="sticky top-0 z-50 px-4 pt-4 pb-3 bg-brand-bg">
         <div className="flex items-center gap-3">
           <button onClick={step > 1 ? () => setStep(step - 1) : onBack}
-            className="w-9 h-9 rounded-full bg-white shadow-card flex items-center justify-center text-v-muted">
+            className="w-9 h-9 rounded-full bg-brand-surface shadow-card flex items-center justify-center text-v-muted">
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           </button>
           <div className="flex-1">
@@ -126,7 +126,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
       <div className="px-4 pb-10">
         {/* ── Step 1: Basic Details ── */}
         {step === 1 && (
-          <div className="bg-white rounded-card p-5 shadow-card mt-2">
+          <div className="bg-brand-surface rounded-card p-5 shadow-card mt-2">
             <p className="text-[15px] font-semibold text-v-text mb-4">Personal Details</p>
 
             <Field label="Full Name *" placeholder="Enter your full name" value={fullName} onChange={setFullName} />
@@ -156,7 +156,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
 
         {/* ── Step 2: Profile ── */}
         {step === 2 && (
-          <div className="bg-white rounded-card p-5 shadow-card mt-2">
+          <div className="bg-brand-surface rounded-card p-5 shadow-card mt-2">
             <p className="text-[15px] font-semibold text-v-text mb-1">Profile Setup</p>
             <p className="text-xs text-v-muted mb-4">Optional — you can add these later</p>
 
@@ -189,7 +189,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
 
         {/* ── Step 3: Payment ── */}
         {step === 3 && (
-          <div className="bg-white rounded-card p-5 shadow-card mt-2">
+          <div className="bg-brand-surface rounded-card p-5 shadow-card mt-2">
             <p className="text-[15px] font-semibold text-v-text mb-1">Payment Details</p>
             <p className="text-xs text-v-muted mb-4">For commission payouts — you can add later</p>
 
@@ -213,7 +213,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
 
         {/* ── Step 4: Agreement ── */}
         {step === 4 && (
-          <div className="bg-white rounded-card p-5 shadow-card mt-2">
+          <div className="bg-brand-surface rounded-card p-5 shadow-card mt-2">
             <p className="text-[15px] font-semibold text-v-text mb-4">Terms & Agreement</p>
 
             <Checkbox checked={agreeTC} onChange={setAgreeTC}

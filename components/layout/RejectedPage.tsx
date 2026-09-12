@@ -14,9 +14,9 @@ export default function RejectedPage({ onLogout }: RejectedPageProps) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-brand-bg">
-      <div className="bg-white rounded-[20px] p-8 w-full max-w-[380px] shadow-card-lg text-center">
+      <div className="bg-brand-surface rounded-[20px] p-8 w-full max-w-[380px] shadow-card-lg text-center">
         <div className="w-20 h-20 rounded-full bg-[#FDF5F5] flex items-center justify-center mx-auto mb-5">
-          <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#C0616B" strokeWidth="1.5">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#C6483B" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 8v4M12 16h.01" />
           </svg>

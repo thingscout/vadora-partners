@@ -26,7 +26,7 @@ export default function HomeTab({ partner, earnings, tiers, notifications }: Hom
     <div className="px-4">
       {/* Greeting Banner */}
       <div className="rounded-card p-5 text-white mb-3"
-        style={{ background: "linear-gradient(135deg, #D4872C, #B8711F)" }}>
+        style={{ background: "linear-gradient(135deg, #E8792B, #C25F1C)" }}>
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold flex-shrink-0">
             {partner.avatar_initials}
@@ -55,7 +55,7 @@ export default function HomeTab({ partner, earnings, tiers, notifications }: Hom
       </div>
 
       {/* Tier Progress */}
-      <div className="bg-white rounded-card p-4 shadow-card mb-3">
+      <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
         <div className="flex justify-between items-center mb-2">
           <p className="text-[13px] font-semibold text-v-text">Tier Progress</p>
           <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
@@ -81,7 +81,7 @@ export default function HomeTab({ partner, earnings, tiers, notifications }: Hom
 
       {/* Earnings Chart */}
       {earnings.length > 0 && (
-        <div className="bg-white rounded-card p-4 shadow-card mb-3">
+        <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
           <p className="text-[13px] font-semibold text-v-text mb-3">Monthly Earnings</p>
           <div className="flex items-end gap-2 h-[80px]">
             {earnings.map((e: any, i: number) => (
@@ -97,7 +97,7 @@ export default function HomeTab({ partner, earnings, tiers, notifications }: Hom
 
       {/* Recent Notifications */}
       {recentNotifications.length > 0 && (
-        <div className="bg-white rounded-card p-4 shadow-card mb-3">
+        <div className="bg-brand-surface rounded-card p-4 shadow-card mb-3">
           <p className="text-[13px] font-semibold text-v-text mb-3">Recent Updates</p>
           {recentNotifications.map((n: any) => (
             <div key={n.id} className={`flex items-start gap-3 py-2.5 border-b border-v-border last:border-0 ${!n.is_read ? "bg-brand-light/50 -mx-2 px-2 rounded" : ""}`}>
@@ -116,7 +116,7 @@ export default function HomeTab({ partner, earnings, tiers, notifications }: Hom
 
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div className="bg-white rounded-card p-3.5 shadow-card">
+    <div className="bg-brand-surface rounded-card p-3.5 shadow-card">
       <p className="text-[11px] text-v-muted font-medium">{label}</p>
       <p className={`text-[20px] font-bold mt-1 ${color || "text-v-text"}`}>{value}</p>
       {sub && <p className="text-[11px] text-v-success mt-0.5">{sub}</p>}
@@ -126,7 +126,7 @@ function StatCard({ label, value, sub, color }: { label: string; value: string; 
 
 function NotifIcon({ type }: { type: string }) {
   const icons: Record<string, { bg: string; color: string }> = {
-    order:        { bg: "#5A8F6B15", color: "#5A8F6B" },
+    order:        { bg: "#4C7A4C15", color: "#4C7A4C" },
     commission:   { bg: "#8B5E8315", color: "#8B5E83" },
     payout:       { bg: "#C9A84C15", color: "#C9A84C" },
     tier_upgrade: { bg: "#C9A84C15", color: "#C9A84C" },

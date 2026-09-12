@@ -36,11 +36,11 @@ export function timeAgo(dateStr: string): string {
 
 // Order status display helpers
 export const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  confirmed:            { label: "Confirmed",            color: "#5A8F6B", bg: "#5A8F6B15" },
+  confirmed:            { label: "Confirmed",            color: "#4C7A4C", bg: "#4C7A4C15" },
   packed:               { label: "Packed",               color: "#6B7FD7", bg: "#6B7FD715" },
-  shipped:              { label: "Shipped",              color: "#D4A843", bg: "#D4A84315" },
-  delivered:            { label: "Delivered",            color: "#5A8F6B", bg: "#5A8F6B15" },
-  commission_eligible:  { label: "Commission Earned",   color: "#D4872C", bg: "#D4872C15" },
-  cancelled:            { label: "Cancelled",            color: "#C0616B", bg: "#C0616B15" },
-  returned:             { label: "Returned",             color: "#C0616B", bg: "#C0616B15" },
+  shipped:              { label: "Shipped",              color: "#E0A94C", bg: "#E0A94C15" },
+  delivered:            { label: "Delivered",            color: "#4C7A4C", bg: "#4C7A4C15" },
+  commission_eligible:  { label: "Commission Earned",   color: "#E8792B", bg: "#E8792B15" },
+  cancelled:            { label: "Cancelled",            color: "#C6483B", bg: "#C6483B15" },
+  returned:             { label: "Returned",             color: "#C6483B", bg: "#C6483B15" },
 };
