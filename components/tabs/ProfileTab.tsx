@@ -49,8 +49,8 @@ export default function ProfileTab({ partner, tiers, onLogout, onBankDetailsUpda
       setPhotoError("Please choose an image file.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setPhotoError("Image must be under 5MB.");
+    if (file.size > 1024 * 1024) {
+      setPhotoError("Image must be under 1MB.");
       return;
     }
 

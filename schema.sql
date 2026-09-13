@@ -166,7 +166,7 @@ CREATE POLICY "Public read access (anon)" ON pin_rto_lookup
 
 -- ── 7. PROFILE PHOTOS (Storage) ──
 -- The 'profile-photos' bucket itself is created via the Supabase Storage API
--- (public, 5MB limit, image/png|jpeg|webp only) — not here, since buckets
+-- (public, 1MB limit, image/png|jpeg|webp only) — not here, since buckets
 -- aren't managed through plain SQL. These RLS policies on storage.objects are,
 -- though, and are required before uploads will work. Files are stored at
 -- <auth.uid()>/avatar.<ext>, so a partner can only write inside their own folder.
