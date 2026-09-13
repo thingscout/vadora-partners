@@ -28,7 +28,7 @@ export default function RejectedPage({ onLogout }: RejectedPageProps) {
           If you believe this is an error, please contact our support team.
         </p>
 
-        <a href="mailto:support@vadorabeauty.com"
+        <a href="mailto:support@vadoracares.com"
           className="block w-full py-3 rounded-btn bg-brand text-white text-sm font-semibold mb-3 text-center">
           Contact Support
         </a>

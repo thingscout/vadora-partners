@@ -1,9 +1,17 @@
+export function calculateGstExclusive(orderAmount: number): number {
+  return orderAmount / 1.18;
+}
+
+export function calculateCommission(gstExclusiveAmount: number, tierRatePercent: number): number {
+  return (gstExclusiveAmount * tierRatePercent) / 100;
+}
+
 export function formatINR(amount: number): string {
   return "₹" + amount.toLocaleString("en-IN");
 }
 
 export function getInitials(name: string): string {
-  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  return (name.split(" ")[0]?.[0] || "").toUpperCase();
 }
 
 export function formatDate(dateStr: string): string {

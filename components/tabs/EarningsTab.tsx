@@ -51,8 +51,8 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
         </div>
         <div className="bg-brand-surface rounded-card p-3.5 shadow-card">
           <p className="text-[10px] text-v-muted font-medium">Next Payout</p>
-          <p className="text-[15px] font-bold text-v-text mt-1">1st of month</p>
-          <p className="text-[10px] text-v-muted mt-0.5">Min ₹500 balance</p>
+          <p className="text-[15px] font-bold text-v-text mt-1">11th of month</p>
+          <p className="text-[10px] text-v-muted mt-0.5">Min ₹300 balance</p>
         </div>
       </div>
 
@@ -103,10 +103,10 @@ export default function EarningsTab({ partner, earnings, payouts }: EarningsTabP
       <div className="bg-brand-light rounded-card p-4 mb-3">
         <p className="text-[13px] font-semibold text-brand mb-2">How Commissions Work</p>
         <div className="space-y-1.5">
-          <p className="text-xs text-v-text">• Customer buys using your referral code</p>
-          <p className="text-xs text-v-text">• Commission is added as <strong>Pending</strong> on order</p>
-          <p className="text-xs text-v-text">• Moves to <strong>Available</strong> after 7-day return window</p>
-          <p className="text-xs text-v-text">• Paid out on the <strong>1st of each month</strong> (min ₹500)</p>
+          <p className="text-xs text-v-text">Commission is calculated on delivered order value, excluding 18% GST.</p>
+          <p className="text-xs text-v-text">There's a 3-day return window after delivery.</p>
+          <p className="text-xs text-v-text">Once your return window closes, commission is finalized based on your tier for that cycle.</p>
+          <p className="text-xs text-v-text">Payouts are processed on the <strong>11th of each month</strong> — minimum ₹300; smaller amounts carry forward and combine with your next cycle's commission until they cross ₹300.</p>
         </div>
       </div>
     </div>

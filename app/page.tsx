@@ -52,8 +52,10 @@ export default function Home() {
     }
   }
 
+  let content: React.ReactNode = null;
+
   if (view === "loading") {
-    return (
+    content = (
       <div className="min-h-screen flex items-center justify-center bg-brand-bg">
         <div className="text-center">
           <div className="w-16 h-16 rounded-full bg-brand flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 animate-pulse">V</div>
@@ -61,14 +63,27 @@ export default function Home() {
         </div>
       </div>
     );
+  } else if (view === "landing") {
+    content = <LandingPage onLogin={() => setView("login")} onRegister={() => setView("register")} />;
+  } else if (view === "login") {
+    content = <LoginPage onSuccess={checkAuth} onBack={() => setView("landing")} onRegister={() => setView("register")} />;
+  } else if (view === "register") {
+    content = <RegisterPage onSuccess={() => setView("pending")} onBack={() => setView("landing")} onLogin={() => setView("login")} />;
+  } else if (view === "pending") {
+    content = <PendingPage onLogout={() => setView("landing")} />;
+  } else if (view === "rejected") {
+    content = <RejectedPage onLogout={() => setView("landing")} />;
+  } else if (view === "dashboard") {
+    content = <DashboardLayout onLogout={() => setView("landing")} />;
   }
 
-  if (view === "landing")   return <LandingPage onLogin={() => setView("login")} onRegister={() => setView("register")} />;
-  if (view === "login")     return <LoginPage onSuccess={checkAuth} onBack={() => setView("landing")} onRegister={() => setView("register")} />;
-  if (view === "register")  return <RegisterPage onSuccess={() => setView("pending")} onBack={() => setView("landing")} onLogin={() => setView("login")} />;
-  if (view === "pending")   return <PendingPage onLogout={() => setView("landing")} />;
-  if (view === "rejected")  return <RejectedPage onLogout={() => setView("landing")} />;
-  if (view === "dashboard") return <DashboardLayout onLogout={() => setView("landing")} />;
-
-  return null;
+  // Constrains every screen to a phone-width "app view" column, even on a wide
+  // desktop viewport, with a neutral backdrop filling the rest of the screen.
+  return (
+    <div className="min-h-screen flex justify-center" style={{ background: "#242217" }}>
+      <div className="w-full max-w-[480px] min-h-screen bg-brand-bg shadow-card-lg relative">
+        {content}
+      </div>
+    </div>
+  );
 }

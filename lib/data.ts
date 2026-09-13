@@ -72,16 +72,55 @@ export async function getPartnerStatus() {
 //  REGISTRATION
 // ══════════════════════════════════════
 
+// ══════════════════════════════════════
+//  PIN CODE / RTO LOOKUP
+// ══════════════════════════════════════
+
+export async function lookupPinCode(pinCode: string) {
+  const { data, error } = await supabase
+    .from("pin_rto_lookup")
+    .select("city, state, rto_code")
+    .eq("pin_code", pinCode)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function submitRegistration(regData: RegistrationData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
+  // Look up city/state/rto_code for the entered pin_code. Never hard-fail
+  // registration over a bad/missing pin_code lookup — fall back to a
+  // placeholder rto_code so referral_code generation can still proceed.
+  const pinLookup = await lookupPinCode(regData.pin_code);
+  if (!pinLookup) {
+    console.warn(`submitRegistration: no pin_rto_lookup match for pin_code "${regData.pin_code}" — using fallback rto_code "XX"`);
+  }
+  const city = pinLookup?.city || regData.city;
+  const state = pinLookup?.state || regData.state;
+  const rtoCode = (pinLookup?.rto_code || "XX").toUpperCase();
+
   // Generate partner code and referral code
   const partnerCode = "VP-" + Math.floor(1000 + Math.random() * 9000);
-  const referralCode = regData.full_name
-    .split(" ")[0]
-    .toUpperCase()
-    .slice(0, 8) + Math.floor(10 + Math.random() * 90);
+
+  const firstNameInitials = (regData.full_name.split(" ")[0] || "").slice(0, 2).toUpperCase();
+
+  let dob = "0000";
+  if (regData.date_of_birth) {
+    const [, month, day] = regData.date_of_birth.split("-"); // YYYY-MM-DD from <input type="date">
+    if (day && month) dob = day + month;
+  } else {
+    console.warn("submitRegistration: no date_of_birth provided — using fallback \"0000\" for referral_code");
+  }
+
+  const { data: serial, error: serialError } = await supabase.rpc("next_partner_serial");
+  if (serialError) throw serialError;
+  const serialNumber = String(serial).padStart(3, "0");
+
+  const referralCode = firstNameInitials + dob + rtoCode + serialNumber;
 
   const initials = regData.full_name
     .split(" ")
@@ -97,14 +136,19 @@ export async function submitRegistration(regData: RegistrationData) {
     .eq("name", "Bronze")
     .single();
 
-  const { error } = await supabase.from("partners").insert({
+  const hasBankDetails = !!((regData.bank_account_number && regData.bank_ifsc) || regData.upi_id);
+
+  const { data: newPartner, error } = await supabase.from("partners").insert({
     auth_user_id: user.id,
     partner_code: partnerCode,
     name: regData.full_name,
     email: regData.email,
     phone: regData.mobile,
     whatsapp: regData.whatsapp,
-    city: regData.city,
+    date_of_birth: regData.date_of_birth || null,
+    pin_code: regData.pin_code,
+    city,
+    state,
     referral_code: referralCode,
     avatar_initials: initials,
     instagram_id: regData.instagram_id || null,
@@ -117,10 +161,113 @@ export async function submitRegistration(regData: RegistrationData) {
     tier_id: bronzeTier?.id || null,
     status: "pending",
     is_active: false,
-  });
+  }).select("id").single();
 
   if (error) throw error;
+
+  if (!hasBankDetails && newPartner) {
+    await supabase.from("notifications").insert({
+      partner_id: newPartner.id,
+      type: "account_setup",
+      title: "Bank details pending",
+      message: "Your bank account details are yet to be updated.",
+    });
+  }
+
   return { success: true };
+}
+
+// ══════════════════════════════════════
+//  BANK DETAILS
+// ══════════════════════════════════════
+
+export async function getBankDetails(partnerId: string) {
+  const { data, error } = await supabase
+    .from("partners")
+    .select("bank_account_name, bank_account_number, bank_ifsc, upi_id")
+    .eq("id", partnerId)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBankDetails(partnerId: string, details: {
+  bank_account_name?: string; bank_account_number?: string; bank_ifsc?: string; upi_id?: string;
+}) {
+  const { error } = await supabase
+    .from("partners")
+    .update({
+      bank_account_name: details.bank_account_name || null,
+      bank_account_number: details.bank_account_number || null,
+      bank_ifsc: details.bank_ifsc || null,
+      upi_id: details.upi_id || null,
+    })
+    .eq("id", partnerId);
+
+  if (error) throw error;
+
+  const hasBankDetails = !!((details.bank_account_number && details.bank_ifsc) || details.upi_id);
+  if (hasBankDetails) {
+    await supabase
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("partner_id", partnerId)
+      .eq("type", "account_setup")
+      .eq("is_read", false);
+  }
+}
+
+// ══════════════════════════════════════
+//  PERSONAL DETAILS
+// ══════════════════════════════════════
+// Deliberately excludes email — changing it is tied to Supabase Auth identity
+// and needs its own re-verification flow, not a plain profile field edit.
+
+export async function updatePersonalDetails(partnerId: string, details: {
+  phone?: string; whatsapp?: string; city?: string; instagram_id?: string;
+}) {
+  const { error } = await supabase
+    .from("partners")
+    .update({
+      phone: details.phone || null,
+      whatsapp: details.whatsapp || null,
+      city: details.city || null,
+      instagram_id: details.instagram_id || null,
+    })
+    .eq("id", partnerId);
+
+  if (error) throw error;
+}
+
+// ══════════════════════════════════════
+//  PROFILE PHOTO
+// ══════════════════════════════════════
+
+export async function uploadProfilePhoto(partnerId: string, file: File) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${user.id}/avatar.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("profile-photos")
+    .upload(path, file, { upsert: true, cacheControl: "3600" });
+
+  if (uploadError) throw uploadError;
+
+  const { data: publicUrlData } = supabase.storage.from("profile-photos").getPublicUrl(path);
+  // Cache-bust so a re-uploaded photo at the same path shows immediately, not a stale cached image.
+  const photoUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
+
+  const { error: updateError } = await supabase
+    .from("partners")
+    .update({ profile_photo_url: photoUrl })
+    .eq("id", partnerId);
+
+  if (updateError) throw updateError;
+  return photoUrl;
 }
 
 // ══════════════════════════════════════
@@ -234,6 +381,20 @@ export async function markNotificationRead(notificationId: string) {
     .from("notifications")
     .update({ is_read: true })
     .eq("id", notificationId);
+
+  if (error) throw error;
+}
+
+export async function markAllNotificationsRead(partnerId: string) {
+  // 'account_setup' notifications are excluded on purpose — they should stay
+  // unread until the underlying issue (e.g. missing bank details) is resolved,
+  // not just because the notification panel was opened.
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("partner_id", partnerId)
+    .eq("is_read", false)
+    .neq("type", "account_setup");
 
   if (error) throw error;
 }

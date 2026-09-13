@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signUpWithEmail, getSession } from "@/lib/auth";
-import { submitRegistration } from "@/lib/data";
+import { submitRegistration, lookupPinCode } from "@/lib/data";
 import { isValidEmail, isValidPhone } from "@/lib/utils";
 import type { RegistrationData, SellingMethod } from "@/types";
 
@@ -31,7 +31,47 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [pinCode, setPinCode] = useState("");
   const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [pinLookupStatus, setPinLookupStatus] = useState<"idle" | "loading" | "found" | "not_found" | "error">("idle");
+
+  const isValidPinCode = /^\d{6}$/.test(pinCode);
+
+  useEffect(() => {
+    if (!isValidPinCode) {
+      setPinLookupStatus("idle");
+      setCity("");
+      setState("");
+      return;
+    }
+
+    let cancelled = false;
+    setPinLookupStatus("loading");
+
+    lookupPinCode(pinCode)
+      .then((result) => {
+        if (cancelled) return;
+        if (result) {
+          setCity(result.city || "");
+          setState(result.state || "");
+          setPinLookupStatus("found");
+        } else {
+          setCity("");
+          setState("");
+          setPinLookupStatus("not_found");
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCity("");
+        setState("");
+        setPinLookupStatus("error");
+      });
+
+    return () => { cancelled = true; };
+  }, [pinCode]);
 
   // Step 2
   const [instagramId, setInstagramId] = useState("");
@@ -49,7 +89,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
   const [agreeAge, setAgreeAge] = useState(false);
   const [agreeEarnings, setAgreeEarnings] = useState(false);
 
-  const step1Valid = fullName.length >= 2 && isValidPhone(mobile) && isValidEmail(email) && password.length >= 6 && city.length >= 2;
+  const step1Valid = fullName.length >= 2 && isValidPhone(mobile) && isValidEmail(email) && password.length >= 6 && dateOfBirth.length > 0 && pinLookupStatus === "found";
   const step4Valid = agreeTC && agreePrivacy && agreeAge && agreeEarnings;
 
   function sameAsWhatsapp() {
@@ -82,7 +122,10 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
         mobile,
         whatsapp: whatsapp || mobile,
         email,
+        date_of_birth: dateOfBirth,
+        pin_code: pinCode,
         city,
+        state,
         instagram_id: instagramId || undefined,
         selling_method: sellingMethod || undefined,
         bank_account_name: bankName || undefined,
@@ -141,7 +184,39 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
 
             <Field label="Email Address *" placeholder="you@example.com" value={email} onChange={setEmail} type="email" />
             <Field label="Password *" placeholder="Min 6 characters" value={password} onChange={setPassword} type="password" />
-            <Field label="City *" placeholder="Your city" value={city} onChange={setCity} />
+
+            <label className="text-xs font-semibold text-v-muted block mb-1.5">Date of Birth *</label>
+            <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required
+              className="w-full px-4 py-3 rounded-btn border border-v-border text-sm text-v-text outline-none focus:border-brand transition-colors bg-transparent mb-3" />
+
+            <label className="text-xs font-semibold text-v-muted block mb-1.5">PIN Code *</label>
+            <input type="text" inputMode="numeric" placeholder="6-digit PIN code" value={pinCode} maxLength={6}
+              onChange={(e) => setPinCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              className="w-full px-4 py-3 rounded-btn border border-v-border text-sm text-v-text outline-none focus:border-brand transition-colors bg-transparent mb-1.5" />
+
+            {pinCode.length > 0 && !isValidPinCode && (
+              <p className="text-[11px] text-v-error mb-2">Enter a valid 6-digit PIN code</p>
+            )}
+            {pinLookupStatus === "loading" && (
+              <p className="text-[11px] text-v-muted mb-2">Looking up city & state...</p>
+            )}
+            {pinLookupStatus === "not_found" && (
+              <p className="text-[11px] text-v-error mb-2">The entered PIN code is incorrect. Please provide a correct 6-digit PIN code.</p>
+            )}
+            {pinLookupStatus === "error" && (
+              <p className="text-[11px] text-v-error mb-2">Couldn't verify this PIN code right now. Please try again.</p>
+            )}
+
+            {pinLookupStatus === "found" && (
+              <div className="flex gap-2 mb-3">
+                <div className="flex-1">
+                  <Field label="City *" placeholder="City" value={city} onChange={setCity} />
+                </div>
+                <div className="flex-1">
+                  <Field label="State *" placeholder="State" value={state} onChange={setState} />
+                </div>
+              </div>
+            )}
 
             <button onClick={() => setStep(2)} disabled={!step1Valid}
               className="w-full mt-2 py-3.5 rounded-btn text-[15px] font-semibold transition-all disabled:bg-v-border disabled:text-v-muted bg-brand text-white active:scale-[0.98]">
@@ -191,7 +266,7 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
         {step === 3 && (
           <div className="bg-brand-surface rounded-card p-5 shadow-card mt-2">
             <p className="text-[15px] font-semibold text-v-text mb-1">Payment Details</p>
-            <p className="text-xs text-v-muted mb-4">For commission payouts — you can add later</p>
+            <p className="text-xs text-v-muted mb-4">For your commission payout, please provide the details</p>
 
             <Field label="Account Holder Name" placeholder="Name as on bank account" value={bankName} onChange={setBankName} />
             <Field label="Bank Account Number" placeholder="Account number" value={bankAccount} onChange={setBankAccount} inputMode="numeric" />
