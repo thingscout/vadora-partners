@@ -327,9 +327,16 @@ CREATE POLICY "Orders: read own" ON referral_orders
 CREATE POLICY "Payouts: read own" ON payouts
   FOR SELECT USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
 
--- Notifications: read & update own
+-- Notifications: read, insert & update own
+-- INSERT is required because submitRegistration() and updateBankDetails()
+-- write the 'account_setup' notification from the browser client (partner's
+-- own session), not a server-side admin client — without this policy those
+-- inserts are silently denied by RLS's default-deny (no error surfaced,
+-- since the calling code didn't check that particular insert's result).
 CREATE POLICY "Notifications: read own" ON notifications
   FOR SELECT USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
+CREATE POLICY "Notifications: insert own" ON notifications
+  FOR INSERT WITH CHECK (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
 CREATE POLICY "Notifications: update own" ON notifications
   FOR UPDATE USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
 
