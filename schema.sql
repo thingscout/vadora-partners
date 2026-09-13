@@ -307,8 +307,13 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE commission_tiers ENABLE ROW LEVEL SECURITY;
 
 -- Partners: read own, insert own (registration)
+-- Uses auth.email() (reads the JWT directly) rather than subquerying partners
+-- itself — a self-referencing subquery inside a policy on the same table
+-- causes Postgres to recurse the policy indefinitely ("infinite recursion
+-- detected in policy for relation 'partners'"). The email fallback exists
+-- for getPartnerProfile()'s "find by email and link auth_user_id" path.
 CREATE POLICY "Partners: read own" ON partners
-  FOR SELECT USING (auth.uid() = auth_user_id OR auth.uid() IN (SELECT auth_user_id FROM partners WHERE email = email));
+  FOR SELECT USING (auth.uid() = auth_user_id OR email = auth.email());
 CREATE POLICY "Partners: insert self" ON partners
   FOR INSERT WITH CHECK (auth.uid() = auth_user_id);
 CREATE POLICY "Partners: update own" ON partners
