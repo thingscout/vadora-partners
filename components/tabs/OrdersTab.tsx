@@ -44,7 +44,7 @@ export default function OrdersTab({ orders, onFilter }: OrdersTabProps) {
           const currentStep = STATUS_STEPS.indexOf(order.status);
 
           return (
-            <div key={order.id} className="bg-white rounded-card shadow-card mb-2.5 overflow-hidden"
+            <div key={order.id} className="bg-brand-surface rounded-card shadow-card mb-2.5 overflow-hidden"
               onClick={() => setExpanded(isExpanded ? null : order.id)}>
               <div className="p-4 flex justify-between items-center">
                 <div>

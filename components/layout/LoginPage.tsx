@@ -78,18 +78,16 @@ export default function LoginPage({ onSuccess, onBack, onRegister }: LoginPagePr
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6"
-      style={{ background: "linear-gradient(160deg, #2B4C6F 0%, #1A3550 100%)" }}>
+      style={{ background: "linear-gradient(160deg, #3D3D22 0%, #242217 100%)" }}>
 
       {/* Logo */}
       <div className="text-center mb-8">
-        <div className="w-[68px] h-[68px] rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center mx-auto mb-3 overflow-hidden">
-          <img src="/logo.png" alt="V" className="w-[44px] h-[44px] object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; (e.target as HTMLImageElement).parentElement!.innerHTML='<span style="color:white;font-size:24px;font-weight:800">V</span>'; }} />
-        </div>
+        <img src="/vadora-logo-light.png" alt="Vadora Cares" className="h-[64px] w-auto object-contain mx-auto mb-4" />
         <h1 className="text-white text-[22px] font-bold">Welcome Back</h1>
       </div>
 
       {/* Card */}
-      <div className="bg-white rounded-[20px] p-7 w-full max-w-[380px] shadow-card-lg">
+      <div className="bg-brand-surface rounded-[20px] p-7 w-full max-w-[380px] shadow-card-lg">
 
         {/* ── OTP Verification Step ── */}
         {step === "otp" ? (

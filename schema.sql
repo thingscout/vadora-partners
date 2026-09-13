@@ -10,7 +10,7 @@ CREATE TABLE commission_tiers (
   name TEXT NOT NULL UNIQUE,          -- Bronze, Silver, Gold
   min_sales NUMERIC DEFAULT 0,
   max_sales NUMERIC,                  -- NULL for top tier (no cap)
-  rate_percent NUMERIC NOT NULL,      -- 8, 10, 12
+  rate_percent NUMERIC NOT NULL,      -- 8, 12, 15
   color TEXT DEFAULT '#C9A84C',
   sort_order INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -18,9 +18,9 @@ CREATE TABLE commission_tiers (
 
 -- Insert default tiers
 INSERT INTO commission_tiers (name, min_sales, max_sales, rate_percent, color, sort_order) VALUES
-  ('Bronze', 0,     24999,  8,  '#B87D5E', 1),
-  ('Silver', 25000, 99999,  10, '#9EAAB0', 2),
-  ('Gold',   100000, NULL,  12, '#C9A84C', 3);
+  ('Bronze', 0,     19999,  8,  '#B87D5E', 1),
+  ('Silver', 20000, 39999,  12, '#9EAAB0', 2),
+  ('Gold',   40000, NULL,   15, '#C9A84C', 3);
 
 
 -- ── 2. PARTNERS ──
@@ -54,6 +54,24 @@ CREATE TABLE partners (
 CREATE INDEX idx_partners_auth ON partners(auth_user_id);
 CREATE INDEX idx_partners_email ON partners(email);
 CREATE INDEX idx_partners_code ON partners(referral_code);
+
+-- Collected at registration alongside city (now auto-filled from pin_rto_lookup)
+ALTER TABLE partners ADD COLUMN date_of_birth DATE;
+ALTER TABLE partners ADD COLUMN pin_code TEXT;
+ALTER TABLE partners ADD COLUMN state TEXT;
+
+-- Global, atomic serial number for referral_code generation (e.g. SH1905UP001).
+-- A plain "count(*) + 1" would race under concurrent registrations and collide
+-- against referral_code's UNIQUE constraint — a sequence guarantees each call
+-- gets a distinct, increasing value even with simultaneous sign-ups.
+CREATE SEQUENCE partner_serial_seq START 1;
+
+CREATE OR REPLACE FUNCTION next_partner_serial()
+RETURNS INT
+LANGUAGE sql
+AS $$
+  SELECT nextval('partner_serial_seq')::INT;
+$$;
 
 
 -- ── 3. REFERRAL ORDERS ──
@@ -91,6 +109,9 @@ CREATE TABLE payouts (
 
 CREATE INDEX idx_payouts_partner ON payouts(partner_id);
 
+ALTER TABLE referral_orders ADD COLUMN payout_id UUID REFERENCES payouts(id);
+CREATE INDEX idx_orders_payout ON referral_orders(payout_id);
+
 
 -- ── 5. NOTIFICATIONS ──
 CREATE TABLE notifications (
@@ -105,6 +126,56 @@ CREATE TABLE notifications (
 
 CREATE INDEX idx_notif_partner ON notifications(partner_id);
 CREATE INDEX idx_notif_unread ON notifications(partner_id, is_read) WHERE is_read = FALSE;
+
+-- 'account_setup' notifications (e.g. "bank details pending") are deliberately
+-- excluded from the generic "mark all read on open" action — they only clear
+-- when the underlying issue (missing bank details) is actually resolved.
+ALTER TABLE notifications DROP CONSTRAINT notifications_type_check;
+ALTER TABLE notifications ADD CONSTRAINT notifications_type_check
+  CHECK (type IN ('order','commission','payout','announcement','tier_upgrade','account_setup'));
+
+
+-- ── 6. PIN CODE / RTO LOOKUP ──
+-- Reference data imported from data/PIN_Code_updated.xlsx via scripts/import-pin-rto.js
+-- pin_code is NOT unique in the source data (multiple city/RTO rows per pin code area),
+-- so it is indexed, not used as the primary key.
+CREATE TABLE pin_rto_lookup (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  pin_code INTEGER NOT NULL,
+  city TEXT,
+  state TEXT,
+  rto_code TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_pin_rto_pin_code ON pin_rto_lookup(pin_code);
+
+
+-- ── 7. PROFILE PHOTOS (Storage) ──
+-- The 'profile-photos' bucket itself is created via the Supabase Storage API
+-- (public, 5MB limit, image/png|jpeg|webp only) — not here, since buckets
+-- aren't managed through plain SQL. These RLS policies on storage.objects are,
+-- though, and are required before uploads will work. Files are stored at
+-- <auth.uid()>/avatar.<ext>, so a partner can only write inside their own folder.
+CREATE POLICY "Profile photos: public read"
+  ON storage.objects FOR SELECT
+  TO public
+  USING (bucket_id = 'profile-photos');
+
+CREATE POLICY "Profile photos: owner upload"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'profile-photos' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Profile photos: owner update"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (bucket_id = 'profile-photos' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Profile photos: owner delete"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'profile-photos' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 
 -- ══════════════════════════════════════════════════════════════════
@@ -203,7 +274,14 @@ SELECT
     COALESCE((SELECT min_sales FROM commission_tiers WHERE sort_order = ct.sort_order + 1), 0)
     - COALESCE((SELECT SUM(order_amount) FROM referral_orders WHERE partner_id = p.id AND status NOT IN ('cancelled','returned')), 0),
     0
-  ) AS sales_to_next_tier
+  ) AS sales_to_next_tier,
+  -- True until either bank account + IFSC, or a UPI ID, has been provided.
+  -- Deliberately exposes only a boolean here, not the raw bank fields.
+  NOT (
+    (p.bank_account_number IS NOT NULL AND p.bank_ifsc IS NOT NULL)
+    OR p.upi_id IS NOT NULL
+  ) AS bank_details_pending,
+  p.profile_photo_url
 FROM partners p
 LEFT JOIN commission_tiers ct ON p.tier_id = ct.id;
 
