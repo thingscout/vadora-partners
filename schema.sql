@@ -307,8 +307,13 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE commission_tiers ENABLE ROW LEVEL SECURITY;
 
 -- Partners: read own, insert own (registration)
+-- Uses auth.email() (reads the JWT directly) rather than subquerying partners
+-- itself — a self-referencing subquery inside a policy on the same table
+-- causes Postgres to recurse the policy indefinitely ("infinite recursion
+-- detected in policy for relation 'partners'"). The email fallback exists
+-- for getPartnerProfile()'s "find by email and link auth_user_id" path.
 CREATE POLICY "Partners: read own" ON partners
-  FOR SELECT USING (auth.uid() = auth_user_id OR auth.uid() IN (SELECT auth_user_id FROM partners WHERE email = email));
+  FOR SELECT USING (auth.uid() = auth_user_id OR email = auth.email());
 CREATE POLICY "Partners: insert self" ON partners
   FOR INSERT WITH CHECK (auth.uid() = auth_user_id);
 CREATE POLICY "Partners: update own" ON partners
@@ -322,9 +327,16 @@ CREATE POLICY "Orders: read own" ON referral_orders
 CREATE POLICY "Payouts: read own" ON payouts
   FOR SELECT USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
 
--- Notifications: read & update own
+-- Notifications: read, insert & update own
+-- INSERT is required because submitRegistration() and updateBankDetails()
+-- write the 'account_setup' notification from the browser client (partner's
+-- own session), not a server-side admin client — without this policy those
+-- inserts are silently denied by RLS's default-deny (no error surfaced,
+-- since the calling code didn't check that particular insert's result).
 CREATE POLICY "Notifications: read own" ON notifications
   FOR SELECT USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
+CREATE POLICY "Notifications: insert own" ON notifications
+  FOR INSERT WITH CHECK (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
 CREATE POLICY "Notifications: update own" ON notifications
   FOR UPDATE USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
 

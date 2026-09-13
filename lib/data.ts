@@ -166,12 +166,13 @@ export async function submitRegistration(regData: RegistrationData) {
   if (error) throw error;
 
   if (!hasBankDetails && newPartner) {
-    await supabase.from("notifications").insert({
+    const { error: notifError } = await supabase.from("notifications").insert({
       partner_id: newPartner.id,
       type: "account_setup",
       title: "Bank details pending",
       message: "Your bank account details are yet to be updated.",
     });
+    if (notifError) console.error("Failed to create bank-details-pending notification:", notifError);
   }
 
   return { success: true };
@@ -209,12 +210,13 @@ export async function updateBankDetails(partnerId: string, details: {
 
   const hasBankDetails = !!((details.bank_account_number && details.bank_ifsc) || details.upi_id);
   if (hasBankDetails) {
-    await supabase
+    const { error: notifError } = await supabase
       .from("notifications")
       .update({ is_read: true })
       .eq("partner_id", partnerId)
       .eq("type", "account_setup")
       .eq("is_read", false);
+    if (notifError) console.error("Failed to clear bank-details-pending notification:", notifError);
   }
 }
 
