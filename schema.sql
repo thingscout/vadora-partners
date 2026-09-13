@@ -150,6 +150,19 @@ CREATE TABLE pin_rto_lookup (
 
 CREATE INDEX idx_pin_rto_pin_code ON pin_rto_lookup(pin_code);
 
+-- Read-only reference data — no partner-specific info, safe for public/anon
+-- read access (needed since PIN lookup on RegisterPage Step 1 runs before
+-- the partner has an authenticated session).
+ALTER TABLE pin_rto_lookup ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Pin lookup: public read" ON pin_rto_lookup
+  FOR SELECT TO authenticated
+  USING (true);
+
+CREATE POLICY "Public read access (anon)" ON pin_rto_lookup
+  FOR SELECT TO anon
+  USING (true);
+
 
 -- ── 7. PROFILE PHOTOS (Storage) ──
 -- The 'profile-photos' bucket itself is created via the Supabase Storage API
