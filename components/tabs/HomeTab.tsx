@@ -19,7 +19,7 @@ export default function HomeTab({ partner, orders, earnings, tiers, notification
     (o: any) => o.status === "commission_eligible" && !o.commission_finalized
   );
   const bucketSales = openBucketOrders.reduce(
-    (sum: number, o: any) => sum + Number(o.gst_exclusive_amount ?? o.order_amount / 1.18 ?? 0),
+    (sum: number, o: any) => sum + Number(o.gst_exclusive_amount ?? o.order_amount / 1.18),
     0
   );
 

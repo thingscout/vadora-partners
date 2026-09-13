@@ -136,24 +136,34 @@ ALTER TABLE notifications ADD CONSTRAINT notifications_type_check
 
 
 -- ── 6. PIN CODE / RTO LOOKUP ──
--- Reference data imported from data/PIN_Code_updated.xlsx via scripts/import-pin-rto.js
--- pin_code is NOT unique in the source data (multiple city/RTO rows per pin code area),
--- so it is indexed, not used as the primary key.
+-- Reference data imported from data/PIN_Code_updated.csv via scripts/import-pin-rto.js.
+-- The source CSV has duplicate pin_code rows (multiple city/RTO entries per pin code
+-- area) — the import script dedupes those client-side (last row wins) before loading,
+-- so pin_code is unique once imported and is used directly as the primary key.
 CREATE TABLE pin_rto_lookup (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  pin_code INTEGER NOT NULL,
+  pin_code TEXT PRIMARY KEY,
   city TEXT,
   state TEXT,
-  rto_code TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
+  rto_code TEXT
 );
 
-CREATE INDEX idx_pin_rto_pin_code ON pin_rto_lookup(pin_code);
+-- Read-only reference data — no partner-specific info, safe for public/anon
+-- read access (needed since PIN lookup on RegisterPage Step 1 runs before
+-- the partner has an authenticated session).
+ALTER TABLE pin_rto_lookup ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Pin lookup: public read" ON pin_rto_lookup
+  FOR SELECT TO authenticated
+  USING (true);
+
+CREATE POLICY "Public read access (anon)" ON pin_rto_lookup
+  FOR SELECT TO anon
+  USING (true);
 
 
 -- ── 7. PROFILE PHOTOS (Storage) ──
 -- The 'profile-photos' bucket itself is created via the Supabase Storage API
--- (public, 5MB limit, image/png|jpeg|webp only) — not here, since buckets
+-- (public, 1MB limit, image/png|jpeg|webp only) — not here, since buckets
 -- aren't managed through plain SQL. These RLS policies on storage.objects are,
 -- though, and are required before uploads will work. Files are stored at
 -- <auth.uid()>/avatar.<ext>, so a partner can only write inside their own folder.
