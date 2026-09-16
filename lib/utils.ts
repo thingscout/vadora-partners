@@ -30,6 +30,37 @@ export function isValidPhone(phone: string): boolean {
   return /^[6-9]\d{9}$/.test(phone.replace(/\D/g, "").slice(-10));
 }
 
+export const MIN_DATE_OF_BIRTH = "1900-01-01";
+
+// <input type="date"> lets a typed year run past four digits, so a slip like
+// "51983-06-19" reaches us as a value the browser considers valid. Returns a
+// message to show, or null when the date is usable.
+export function dateOfBirthError(value: string, today: Date = new Date()): string | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return "Enter a valid date of birth";
+
+  const [year, month, day] = match.slice(1).map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  // Rejects dates that roll over, e.g. 31 February.
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+    return "Enter a valid date of birth";
+  }
+  if (value < MIN_DATE_OF_BIRTH) return "Enter a valid date of birth";
+
+  const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  if (date.getTime() > todayUtc) return "Date of birth can't be in the future";
+  // Registration also asks partners to confirm they are 18 or older.
+  if (Date.UTC(year + 18, month - 1, day) > todayUtc) return "You must be 18 or older to register";
+
+  return null;
+}
+
+// YYYY-MM-DD in local time, for a date input's max attribute.
+export function todayISODate(today: Date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+}
+
 export function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);

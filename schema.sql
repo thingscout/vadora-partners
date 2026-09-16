@@ -113,6 +113,30 @@ ALTER TABLE referral_orders ADD COLUMN payout_id UUID REFERENCES payouts(id);
 CREATE INDEX idx_orders_payout ON referral_orders(payout_id);
 
 
+-- ── Monthly Tier History ──
+-- Written by app/api/cron/finalize-bucket/route.ts when a bucket freezes.
+-- Was never added here even though it already existed directly in the dev
+-- database (created manually, predating schema.sql tracking it) — prod is
+-- missing it entirely.
+CREATE TABLE monthly_tier_history (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  partner_id UUID REFERENCES partners(id) NOT NULL,
+  bucket_month DATE NOT NULL,
+  bucket_sales_gst_exclusive NUMERIC NOT NULL DEFAULT 0,
+  tier_id UUID REFERENCES commission_tiers(id) NOT NULL,
+  tier_name TEXT NOT NULL,
+  tier_rate_percent NUMERIC NOT NULL,
+  is_frozen BOOLEAN DEFAULT FALSE,
+  frozen_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(partner_id, bucket_month)
+);
+CREATE INDEX idx_tier_history_partner ON monthly_tier_history(partner_id);
+ALTER TABLE monthly_tier_history ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Tier history: read own" ON monthly_tier_history
+  FOR SELECT USING (partner_id IN (SELECT id FROM partners WHERE auth_user_id = auth.uid()));
+
+
 -- ── 5. NOTIFICATIONS ──
 CREATE TABLE notifications (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

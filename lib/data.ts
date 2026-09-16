@@ -1,4 +1,5 @@
 import { createClient } from "./supabase";
+import { dateOfBirthError } from "./utils";
 import type { RegistrationData } from "@/types";
 
 const supabase = createClient();
@@ -107,6 +108,11 @@ export async function submitRegistration(regData: RegistrationData) {
   const partnerCode = "VP-" + Math.floor(1000 + Math.random() * 9000);
 
   const firstNameInitials = (regData.full_name.split(" ")[0] || "").slice(0, 2).toUpperCase();
+
+  // The form already blocks this; checked again here because a malformed date
+  // would be stored on the partner and baked into their referral code.
+  const dobProblem = regData.date_of_birth ? dateOfBirthError(regData.date_of_birth) : null;
+  if (dobProblem) throw new Error(dobProblem);
 
   let dob = "0000";
   if (regData.date_of_birth) {
