@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { signUpWithEmail, getSession } from "@/lib/auth";
 import { submitRegistration, lookupPinCode } from "@/lib/data";
-import { isValidEmail, isValidPhone } from "@/lib/utils";
+import { dateOfBirthError, isValidEmail, isValidPhone, MIN_DATE_OF_BIRTH, todayISODate } from "@/lib/utils";
 import type { RegistrationData, SellingMethod } from "@/types";
 
 interface RegisterPageProps {
@@ -89,7 +89,8 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
   const [agreeAge, setAgreeAge] = useState(false);
   const [agreeEarnings, setAgreeEarnings] = useState(false);
 
-  const step1Valid = fullName.length >= 2 && isValidPhone(mobile) && isValidEmail(email) && password.length >= 6 && dateOfBirth.length > 0 && pinLookupStatus === "found";
+  const dobError = dateOfBirth ? dateOfBirthError(dateOfBirth) : null;
+  const step1Valid = fullName.length >= 2 && isValidPhone(mobile) && isValidEmail(email) && password.length >= 6 && dateOfBirth.length > 0 && !dobError && pinLookupStatus === "found";
   const step4Valid = agreeTC && agreePrivacy && agreeAge && agreeEarnings;
 
   function sameAsWhatsapp() {
@@ -187,7 +188,11 @@ export default function RegisterPage({ onSuccess, onBack, onLogin }: RegisterPag
 
             <label className="text-xs font-semibold text-v-muted block mb-1.5">Date of Birth *</label>
             <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required
-              className="w-full px-4 py-3 rounded-btn border border-v-border text-sm text-v-text outline-none focus:border-brand transition-colors bg-transparent mb-3" />
+              min={MIN_DATE_OF_BIRTH} max={todayISODate()}
+              className={`w-full px-4 py-3 rounded-btn border border-v-border text-sm text-v-text outline-none focus:border-brand transition-colors bg-transparent ${dobError ? "mb-1.5" : "mb-3"}`} />
+            {dobError && (
+              <p className="text-[11px] text-v-error mb-3">{dobError}</p>
+            )}
 
             <label className="text-xs font-semibold text-v-muted block mb-1.5">PIN Code *</label>
             <input type="text" inputMode="numeric" placeholder="6-digit PIN code" value={pinCode} maxLength={6}
